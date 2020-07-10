@@ -1,0 +1,16 @@
+FROM ubuntu:18.04
+
+RUN apt-get update -y && \
+    apt-get install -y python-pip python-dev
+
+COPY ./requirments.txt /app/requirments.txt
+
+WORKDIR /app
+
+RUN pip install -r requirments.txt
+
+COPY . /app
+
+ENTRYPOINT [ "python" ]
+
+CMD [ "app.py" ]

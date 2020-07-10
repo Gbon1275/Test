@@ -1,0 +1,2 @@
+
+Ansible-playbook /Ansible/playbook.yml -i /Ansible/.hosts -U some-jenkins-private-key

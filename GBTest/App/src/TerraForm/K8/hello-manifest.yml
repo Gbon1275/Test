@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: HelloApp
+spec:
+    selector:
+      matchLabels:
+        app: HelloApp
+    template:
+      metadata:
+        lables:
+          app: HelloApp
+      spec:
+        containers:
+        - name: HelloApp
+          image: gbon1275/app_01
+          resources:
+            limits:
+              memory: "128mi"
+              cpu: "500m"
+          ports:
+          - containerPort: 80

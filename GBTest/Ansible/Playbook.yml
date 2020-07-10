@@ -1,0 +1,54 @@
+---
+- hosts: apinodes
+  become: true
+  become_method: sudo
+  tasks:
+    - name: install packages
+      apt: name = {{item}} state=installed
+      with_items:
+        - python3-pip
+        - python3-dev
+        - nginx
+
+- hosts: apinodes
+  tasks:
+    - name: pull app for git
+    git:
+      repo: #git repo
+      dest: /home/{{ ansible_ssh_user }}/{{ app_name }}.git
+      update: yes
+    pip:
+      requirments: /home//home/{{ ansible_ssh_user }}/{{ app_name }}/requirments.txt
+
+- hosts: apinodes
+  become: true
+  become_method: sudo
+  tasks:
+    - name: template systemd service config
+      copy: 
+        src: .service
+        dest: /etc/systemd/system/{ app_name }.service
+    - name: start systemd app service
+      systemd: name={{ app_name }}.service state=restarted enabled=yes
+    - name: template nginx site config
+      template:
+        src: .nginx
+        dest: /etc/nginx/sites-available/{{ app_name }}
+    - name: template nginx site config
+      template:
+        src: .nginx
+        dest: /etc/nginx/sites-available/{{ app_name }}
+    - name: remove default nginx site config
+      file: path=/etc/nginx/sites-enabled/default state=absent
+    - name: enable nginx site
+      file:
+        src: /etc/nginx/sites-available/{{ app_name }}
+        dest: /etc/nginx/sites-enabled/default
+        state: link
+        force: yes
+    - name: restart nginx
+      systemd: name=nginx state=restarted enabled=yes
+    - name: open firewall for nginx
+      ufw:
+        rule: allow
+        name: Nginx Full
